@@ -8,6 +8,10 @@ public class BigNumberTest {
     public void comparacions() {
         BigNumber b1, b2;
 
+        b1 = new BigNumber("0");
+        b2 = new BigNumber("000");
+        assertEquals(b1,b2);
+
         b1 = new BigNumber("2");
         b2 = new BigNumber("02");
         assertEquals(b1, b2);
