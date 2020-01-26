@@ -19,42 +19,65 @@ class BigNumber {
 
         BigNumber resultat = new BigNumber("");
 
-        System.out.println("Numeros a operar : ");
-        System.out.println(this.numero);
-        System.out.println(other.numero);
-
-
         int sum;
         int acum = 0;
-        for (int i = this.numero.length()-1; i >= 0 ; i--) {
+        for (int i = this.numero.length() - 1; i >= 0; i--) {
 
             int num1 = Integer.parseInt(String.valueOf(this.numero.charAt(i)));
             int num2 = Integer.parseInt(String.valueOf(other.numero.charAt(i)));
 
-            sum = num1+num2+acum;
-acum=0;
-            if (sum > 9 ){
-                acum = sum/10;
-                sum = sum%10;
+            sum = num1 + num2 + acum;
+            acum = 0;
+            if (sum > 9) {
+                acum = sum / 10;
+                sum = sum % 10;
             }
 
 
             resultat.numero = sum + resultat.numero;
 
-            System.out.println("Por ahora resultado es " + resultat.numero);
-
         }
-        if (acum != 0){
+        if (acum != 0) {
             resultat.numero = acum + resultat.numero;
         }
-
-        System.out.println("Resultado = " + resultat.numero);
         return resultat;
     }
 
     // Resta
     BigNumber sub(BigNumber other) {
-        return other;
+
+        compareTo(other);
+
+        BigNumber resultat = new BigNumber("");
+
+
+        int res;
+        int acum = 0;
+        for (int i = this.numero.length() - 1; i >= 0; i--) {
+
+            int num1 = Integer.parseInt(String.valueOf(this.numero.charAt(i)));
+            int num2 = Integer.parseInt(String.valueOf(other.numero.charAt(i)));
+
+
+            if (acum > 0){
+                num2+=1;
+                acum=0;
+            }
+
+            if (num1 < num2){
+                num1+=10;
+                acum=1;
+            }
+
+            res = num1-num2;
+
+            resultat.numero = res + resultat.numero;
+
+
+
+
+        }
+        return resultat;
     }
 
     // Multiplica
