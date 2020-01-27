@@ -59,21 +59,19 @@ class BigNumber {
             int num2 = Integer.parseInt(String.valueOf(other.numero.charAt(i)));
 
 
-            if (acum > 0){
-                num2+=1;
-                acum=0;
+            if (acum > 0) {
+                num2 += 1;
+                acum = 0;
             }
 
-            if (num1 < num2){
-                num1+=10;
-                acum=1;
+            if (num1 < num2) {
+                num1 += 10;
+                acum = 1;
             }
 
-            res = num1-num2;
+            res = num1 - num2;
 
             resultat.numero = res + resultat.numero;
-
-
 
 
         }
@@ -82,12 +80,55 @@ class BigNumber {
 
     // Multiplica
     BigNumber mult(BigNumber other) {
-        return other;
+
+        BigNumber resultado = new BigNumber("");
+
+
+        for (int i = other.numero.length() - 1, cont = 0; i >= 0; i--, cont++) {
+            BigNumber suma = new BigNumber("");
+            int acumul = 0;
+
+            for (int j = this.numero.length() - 1; j >= 0; j--) {
+
+
+                int num1 = Integer.parseInt(String.valueOf(other.numero.charAt(i)));
+                int num2 = Integer.parseInt(String.valueOf(this.numero.charAt(j)));
+
+                int mult = num1 * num2 + acumul;
+
+                acumul = 0;
+
+                if (mult > 9) {
+
+                    acumul = mult / 10;
+                    mult = mult % 10;
+
+                }
+
+                suma.numero = mult + suma.numero;
+
+            }
+
+            for (int j = 0; j < cont; j++) {
+                suma.numero = suma.numero + "0";
+            }
+
+            if (acumul != 0) {
+                suma.numero = acumul + suma.numero;
+            }
+            resultado.numero = resultado.add(suma).numero;
+
+        }
+
+
+        return resultado;
     }
 
     // Divideix
     BigNumber div(BigNumber other) {
-        return other;
+
+
+        return null;
     }
 
     // Arrel quadrada
@@ -156,11 +197,13 @@ class BigNumber {
     }
 
     // Torna un String representant el número
+    @Override
     public String toString() {
         return this.numero;
     }
 
     // Mira si dos objectes BigNumber són iguals
+    @Override
     public boolean equals(Object other) {
 
         //Comprobamos que el objeto recibido es un objeto tipo BigNumber
@@ -214,6 +257,8 @@ class BigNumber {
         return true;
     }
 
+
+    //Funcion para añadir ceros a la izquieda y que queden los numeros con la misma longitud
     String addZero(BigNumber bn, int nLong) {
 
         while (bn.numero.length() < nLong) {
