@@ -127,8 +127,42 @@ class BigNumber {
     // Divideix
     BigNumber div(BigNumber other) {
 
+        BigNumber resultat = new BigNumber("");
 
-        return null;
+        if (this.compareTo(other) == -1) {
+            return new BigNumber("0");
+        }
+
+        BigNumber xifraDividir = new BigNumber("");
+
+        for (int i = 0; i < this.numero.length(); i++) {
+
+            xifraDividir.numero += this.numero.charAt(i);
+
+            if (other.compareTo(xifraDividir) == -1) {
+
+                for (int j = 0; j < 11; j++) {
+
+                    BigNumber multiplicacion = new BigNumber(String.valueOf(j)).mult(other);
+                    if (multiplicacion.compareTo(xifraDividir) == 1) {
+                        resultat.numero += new BigNumber(String.valueOf(j - 1));
+                        xifraDividir = xifraDividir.sub(new BigNumber(String.valueOf(j - 1)).mult(other));
+                        break;
+                    } else if (multiplicacion.compareTo(xifraDividir) == 0) {
+                        resultat.numero += new BigNumber(String.valueOf(j));
+                        xifraDividir = xifraDividir.sub(multiplicacion);
+                        break;
+                    }
+                }
+            } else if (other.compareTo(xifraDividir) == 0) {
+                resultat.numero += new BigNumber("1");
+                xifraDividir.numero = "0";
+            } else {
+                resultat.numero += 0;
+            }
+        }
+
+        return resultat;
     }
 
     // Arrel quadrada
@@ -138,11 +172,21 @@ class BigNumber {
 
     // Potència
     BigNumber power(int n) {
-        return new BigNumber("2");
+
+        BigNumber resultat = new BigNumber(this.numero);
+
+        for (int i = 1; i < n; i++) {
+            resultat = resultat.mult(this);
+        }
+
+        return resultat;
     }
 
     // Factorial
     BigNumber factorial() {
+
+
+
         return new BigNumber("2");
 
     }
