@@ -1,63 +1,97 @@
 import java.util.Arrays;
 
+// Esta clase es utilizada para almacenar y calcular números extremadamente grandes que no son soportados
+// por las variables numéricas habituales con un único atributo que sería el propio número.
 class BigNumber {
 
     String numero;
 
-    // Constructor 1
+    // Constructor 1. Creamos el objeto a partir de un String con el valor del número
     public BigNumber(String s) {
         this.numero = s;
     }
 
-    // Constructor 2
+    // Constructor 2. Creamos el objeto a partir de otro objeto BigNumber
     public BigNumber(BigNumber b) {
         this.numero = b.numero;
     }
 
-    // Suma
+    // Suma. Realizamos la suma entre 2 objetos BigNumber
     BigNumber add(BigNumber other) {
 
-        addZero(this, other.numero.length());
-        addZero(other, this.numero.length());
+        //Igualamos la longitud de ambos numeros, al más corto, le añadiremos tantos 0
+        // a la izquierda hasta que iguale la longitud del otro
 
+        if (this.numero.length() > other.numero.length()) {
+            addZero(other, this.numero.length());
+        } else {
+            addZero(this, other.numero.length());
+        }
+
+        //Creamos un objeto que almacenará el resultado, y dos variables int que almacenarán
+        // variables para calcular la suma
         BigNumber resultat = new BigNumber("");
 
         int sum;
         int acum = 0;
+
         for (int i = this.numero.length() - 1; i >= 0; i--) {
+
+            //Recorremos el número de izquierda a derecha para hacer los cálculos
 
             int num1 = Integer.parseInt(String.valueOf(this.numero.charAt(i)));
             int num2 = Integer.parseInt(String.valueOf(other.numero.charAt(i)));
 
+            //Sumamos los dos numeros, y sumamos el aculumativo en el caso de que en la anterior suma, el resultante
+            //hubiera sido mayor a 9
             sum = num1 + num2 + acum;
             acum = 0;
+
+            //Si el resultado es mayor a 9, ponemos solo la unidad de la operacion y el resto lo almacenamos en la variable
+            // acum
             if (sum > 9) {
                 acum = sum / 10;
                 sum = sum % 10;
             }
 
+            //Al resultado final le añadimos la parte unitaria de la operacion
 
             resultat.numero = sum + resultat.numero;
 
         }
+
+        //Si cuando terminamos las operaciones, acumul es diferente a 0, tendremos que añadirlo al resultado,
+        // ya que sino, la operación sería incorrecta
         if (acum != 0) {
             resultat.numero = acum + resultat.numero;
         }
         return resultat;
     }
 
-    // Resta
+    // Resta. Realizamos la resta entre 2 objetos BigNumber
     BigNumber sub(BigNumber other) {
 
-        addZero(this, other.numero.length());
-        addZero(other, this.numero.length());
+        //Igualamos la longitud de ambos numeros, al más corto, le añadiremos tantos 0
+        // a la izquierda hasta que iguale la longitud del otro
 
+        if (this.numero.length() > other.numero.length()) {
+            addZero(other, this.numero.length());
+        } else {
+            addZero(this, other.numero.length());
+        }
+
+        //De igual manera que hacemos con la suma, en la resta tenemos un objeto BigNumber que devolverá
+        // el resultado de la operación, y dos variables int que servirán para realizar la operación.
         BigNumber resultat = new BigNumber("");
 
 
         int res;
         int acum = 0;
+
+
         for (int i = this.numero.length() - 1; i >= 0; i--) {
+
+
 
             int num1 = Integer.parseInt(String.valueOf(this.numero.charAt(i)));
             int num2 = Integer.parseInt(String.valueOf(other.numero.charAt(i)));
@@ -208,45 +242,43 @@ class BigNumber {
 
         for (int i = 0; i < rQuad.length; i++) {
             System.out.println("Entramos en el primer bucle");
-            aux.numero+=rQuad[i];
+            aux.numero += rQuad[i];
 
             System.out.println("El valor actual de aux es " + aux);
 
             for (int j = 0; j < 11; j++) {
 
-              //  BigNumber resX2 = new BigNumber((resultado.mult(new BigNumber("2")).add(new BigNumber(String.valueOf(j)))).mult(new BigNumber(String.valueOf(j))));
+                //  BigNumber resX2 = new BigNumber((resultado.mult(new BigNumber("2")).add(new BigNumber(String.valueOf(j)))).mult(new BigNumber(String.valueOf(j))));
 
-                BigNumber resX2 = new BigNumber(resultado.mult(new BigNumber("2")).numero+(j));
+                BigNumber resX2 = new BigNumber(resultado.mult(new BigNumber("2")).numero + (j));
                 resX2 = resX2.mult(new BigNumber(String.valueOf(j)));
 
 
-                System.out.println("Valor de resX2 es " +resX2);
+                System.out.println("Valor de resX2 es " + resX2);
                 System.out.println("Valor de aux es " + aux);
 
-                if (resX2.compareTo(aux) == 1){
+                if (resX2.compareTo(aux) == 1) {
                     System.out.println("El numero inmediatamente mayor a " + aux + " es " + resX2);
 
 
+                    BigNumber resta = new BigNumber(resultado.mult(new BigNumber("2")).numero + (j - 1));
 
-                    BigNumber resta = new BigNumber(resultado.mult(new BigNumber("2")).numero+(j-1));
-
-                    resta = resta.mult(new BigNumber(String.valueOf(j-1)));
+                    resta = resta.mult(new BigNumber(String.valueOf(j - 1)));
 
                     aux = aux.sub(resta);
 
-                    resultado.numero += String.valueOf(j-1);
+                    resultado.numero += String.valueOf(j - 1);
 
 
                     break;
-                }else if (resX2.equals(aux)){
+                } else if (resX2.equals(aux)) {
                     System.out.println(aux + " y " + resX2 + " son iguales");
-                    resultado.numero+=j;
+                    resultado.numero += j;
                     aux = aux.sub(resX2);
                     break;
                 }
 
             }
-
 
 
         }
