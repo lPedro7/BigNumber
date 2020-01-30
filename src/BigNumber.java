@@ -1,3 +1,5 @@
+import java.util.Arrays;
+
 class BigNumber {
 
     String numero;
@@ -15,7 +17,8 @@ class BigNumber {
     // Suma
     BigNumber add(BigNumber other) {
 
-        compareTo(other);
+        addZero(this, other.numero.length());
+        addZero(other, this.numero.length());
 
         BigNumber resultat = new BigNumber("");
 
@@ -46,7 +49,8 @@ class BigNumber {
     // Resta
     BigNumber sub(BigNumber other) {
 
-        compareTo(other);
+        addZero(this, other.numero.length());
+        addZero(other, this.numero.length());
 
         BigNumber resultat = new BigNumber("");
 
@@ -84,6 +88,8 @@ class BigNumber {
         BigNumber resultado = new BigNumber("");
 
 
+        if (this.equals(new BigNumber("0")) || other.equals(new BigNumber("0"))) return new BigNumber("0");
+
         for (int i = other.numero.length() - 1, cont = 0; i >= 0; i--, cont++) {
             BigNumber suma = new BigNumber("");
             int acumul = 0;
@@ -120,7 +126,6 @@ class BigNumber {
 
         }
 
-
         return resultado;
     }
 
@@ -128,6 +133,8 @@ class BigNumber {
     BigNumber div(BigNumber other) {
 
         BigNumber resultat = new BigNumber("");
+
+        BigNumber resto = new BigNumber("");
 
         if (this.compareTo(other) == -1) {
             return new BigNumber("0");
@@ -144,6 +151,7 @@ class BigNumber {
                 for (int j = 0; j < 11; j++) {
 
                     BigNumber multiplicacion = new BigNumber(String.valueOf(j)).mult(other);
+
                     if (multiplicacion.compareTo(xifraDividir) == 1) {
                         resultat.numero += new BigNumber(String.valueOf(j - 1));
                         xifraDividir = xifraDividir.sub(new BigNumber(String.valueOf(j - 1)).mult(other));
@@ -157,17 +165,95 @@ class BigNumber {
             } else if (other.compareTo(xifraDividir) == 0) {
                 resultat.numero += new BigNumber("1");
                 xifraDividir.numero = "0";
-            } else {
+            } else if (resultat.numero.length() > 0) {
                 resultat.numero += 0;
             }
         }
 
+        resto.numero = xifraDividir.numero;
         return resultat;
     }
 
+
     // Arrel quadrada
     BigNumber sqrt() {
-        return new BigNumber("1");
+
+        BigNumber resultado = new BigNumber("0");
+        BigNumber aux = new BigNumber("");
+
+
+        if (this.numero.length() % 2 != 0) {
+            this.numero = "0" + this.numero;
+        }
+
+        System.out.println("Dividimos en grupos de 2 el dividendo : ");
+
+        String[] rQuad = new String[this.numero.length() / 2];
+
+        Arrays.fill(rQuad, "");
+
+        for (int i = 0, cont = 0; i < rQuad.length; i++) {
+
+            for (int j = 0; j < 2; j++, cont++) {
+                rQuad[i] += this.numero.charAt(cont);
+            }
+            System.out.println(i + " - " + rQuad[i]);
+
+        }
+
+
+        System.out.println("Bajamos los 2 primeros numeros");
+
+        System.out.println("Buscamos un numero que se aproxime sin superar el valor de los primeros 2 numeros");
+
+        for (int i = 0; i < rQuad.length; i++) {
+            System.out.println("Entramos en el primer bucle");
+            aux.numero+=rQuad[i];
+
+            System.out.println("El valor actual de aux es " + aux);
+
+            for (int j = 0; j < 11; j++) {
+
+              //  BigNumber resX2 = new BigNumber((resultado.mult(new BigNumber("2")).add(new BigNumber(String.valueOf(j)))).mult(new BigNumber(String.valueOf(j))));
+
+                BigNumber resX2 = new BigNumber(resultado.mult(new BigNumber("2")).numero+(j));
+                resX2 = resX2.mult(new BigNumber(String.valueOf(j)));
+
+
+                System.out.println("Valor de resX2 es " +resX2);
+                System.out.println("Valor de aux es " + aux);
+
+                if (resX2.compareTo(aux) == 1){
+                    System.out.println("El numero inmediatamente mayor a " + aux + " es " + resX2);
+
+
+
+                    BigNumber resta = new BigNumber(resultado.mult(new BigNumber("2")).numero+(j-1));
+
+                    resta = resta.mult(new BigNumber(String.valueOf(j-1)));
+
+                    aux = aux.sub(resta);
+
+                    resultado.numero += String.valueOf(j-1);
+
+
+                    break;
+                }else if (resX2.equals(aux)){
+                    System.out.println(aux + " y " + resX2 + " son iguales");
+                    resultado.numero+=j;
+                    aux = aux.sub(resX2);
+                    break;
+                }
+
+            }
+
+
+
+        }
+        System.out.println("resultado es " + resultado);
+
+
+        return resultado;
     }
 
     // Potència
@@ -185,25 +271,41 @@ class BigNumber {
     // Factorial
     BigNumber factorial() {
 
+        BigNumber bn = new BigNumber(this.numero);
+
+        int i = 1;
+
+        BigNumber count = new BigNumber(this);
+
+        while (this.compareTo(new BigNumber(String.valueOf(i))) == 1) {
+
+            bn = bn.mult(count.sub(new BigNumber(("1"))));
+            count = count.sub(new BigNumber("1"));
+
+            i++;
+
+        }
 
 
-        return new BigNumber("2");
+        return bn;
 
     }
 
     // MCD. Torna el Màxim comú divisor
     BigNumber mcd(BigNumber other) {
-        return new BigNumber("2");
 
+        return obtener_mcd(this, other);
     }
 
     // Compara dos BigNumber. Torna 0 si són iguals, -1
 // si el primer és menor i torna 1 si el segon és menor
     public int compareTo(BigNumber other) {
 
+
         if (this.numero.length() > other.numero.length()) {
 
             while (this.numero.length() > other.numero.length()) {
+
                 other.numero = '0' + other.numero;
             }
 
@@ -231,11 +333,14 @@ class BigNumber {
 
 
             if (numPrimer > numSegon) {
+
                 return 1;
             } else if (numSegon > numPrimer) {
+
                 return -1;
             }
         }
+
         return 0;
 
     }
@@ -249,6 +354,7 @@ class BigNumber {
     // Mira si dos objectes BigNumber són iguals
     @Override
     public boolean equals(Object other) {
+
 
         //Comprobamos que el objeto recibido es un objeto tipo BigNumber
         if (other instanceof BigNumber) {
@@ -281,7 +387,6 @@ class BigNumber {
                 return true;
             }
 
-
         }
 
         return false;
@@ -309,7 +414,45 @@ class BigNumber {
             bn.numero = '0' + bn.numero;
         }
 
+
         return bn.numero;
     }
 
+    BigNumber getResto(BigNumber bn) {
+
+        BigNumber resultat = new BigNumber("");
+
+        resultat = this.sub(bn.mult(this.div(bn)));
+
+        return resultat;
+    }
+
+    BigNumber removeZero(BigNumber bn) {
+
+        if (!allZero(bn)) {
+
+            for (int i = 0; bn.numero.charAt(i) == '0'; ) {
+                bn.numero = bn.numero.substring(i + 1);
+            }
+        }
+        return bn;
+    }
+
+    BigNumber obtener_mcd(BigNumber bn1, BigNumber bn) {
+
+
+        removeZero(bn1);
+        removeZero(bn);
+
+        if (bn.equals(new BigNumber("0"))) {
+            return bn1;
+        } else if (bn1.equals(new BigNumber("0"))) {
+            return bn;
+        } else
+            return obtener_mcd(bn, bn1.getResto(bn));
+
+    }
+
 }
+
+
