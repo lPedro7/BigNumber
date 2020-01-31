@@ -32,7 +32,6 @@ class BigNumber {
         // variables para calcular la suma
         BigNumber resultat = new BigNumber("");
 
-        int sum;
         int acum = 0;
 
         for (int i = this.numero.length() - 1; i >= 0; i--) {
@@ -44,14 +43,14 @@ class BigNumber {
 
             //Sumamos los dos numeros, y sumamos el aculumativo en el caso de que en la anterior suma, el resultante
             //hubiera sido mayor a 9
-            sum = num1 + num2 + acum;
+            int sum = num1 + num2 + acum;
             acum = 0;
 
             //Si el resultado es mayor a 9, ponemos solo la unidad de la operacion y el resto lo almacenamos en la variable
             // acum
             if (sum > 9) {
-                acum = sum / 10;
-                sum = sum % 10;
+                acum++;
+                sum = sum - 10;
             }
 
             //Al resultado final le añadimos la parte unitaria de la operacion
@@ -89,14 +88,16 @@ class BigNumber {
         int acum = 0;
 
 
+        // Recorreremos el String para realizar la operación carácter por carácter
         for (int i = this.numero.length() - 1; i >= 0; i--) {
 
 
-
+            // Asignamos el carácter correspondiente de la operacion a dos variables int
             int num1 = Integer.parseInt(String.valueOf(this.numero.charAt(i)));
             int num2 = Integer.parseInt(String.valueOf(other.numero.charAt(i)));
 
-
+            // En el caso de que el primer número sea menor al segundo, deberemos sumarle 10, ya que así seguro que
+            // será mayor, posteriormente esto que hemos añadido, lo deberemos restar al siguiente número
             if (acum > 0) {
                 num2 += 1;
                 acum = 0;
@@ -107,33 +108,48 @@ class BigNumber {
                 acum = 1;
             }
 
+            //Realizamos la resta y añadimos el valor al resultado
             res = num1 - num2;
 
             resultat.numero = res + resultat.numero;
 
 
         }
+
         return resultat;
     }
 
-    // Multiplica
+    // Multiplica. Realizamos la multiplicación entre dos objetos BigNumber
     BigNumber mult(BigNumber other) {
 
+        //Creamos el objeto que contendrá el resultado de la operación
         BigNumber resultado = new BigNumber("");
 
-
+        //Si uno de los dos valores es 0, devolveremos 0 directamente
         if (this.equals(new BigNumber("0")) || other.equals(new BigNumber("0"))) return new BigNumber("0");
 
+
+        //En este bucle añadimos una variable llamada "cont", que sirve para hacer el escalado cuando operamos
+        // añadiendo 0 a la derecha
         for (int i = other.numero.length() - 1, cont = 0; i >= 0; i--, cont++) {
+
+            // El objeto suma contendrá el resultado de la multiplicación de cada unidad de uno de los factores,
+            // una vez que cambiemos de unidad se reseteará
             BigNumber suma = new BigNumber("");
+
+            //Para la variable acumul seguiremos la misma lógica que en la suma, cuando supera las 9 unidades
+            // añadiremos el deceno a la siguiente operación
             int acumul = 0;
 
+            //Empezamos a operar
             for (int j = this.numero.length() - 1; j >= 0; j--) {
 
 
+                //Cogemos las primeras unidades, en este caso, num1 cambiará con el bucle anterior
                 int num1 = Integer.parseInt(String.valueOf(other.numero.charAt(i)));
                 int num2 = Integer.parseInt(String.valueOf(this.numero.charAt(j)));
 
+                //Realizamos la operación sumandole el acumulativo si tuviera alguno
                 int mult = num1 * num2 + acumul;
 
                 acumul = 0;
@@ -145,6 +161,7 @@ class BigNumber {
 
                 }
 
+                //Añadimos al objeto suma el resultado de esta operación
                 suma.numero = mult + suma.numero;
 
             }
@@ -156,6 +173,7 @@ class BigNumber {
             if (acumul != 0) {
                 suma.numero = acumul + suma.numero;
             }
+            //Una vez acabada las operaciones con la unidad, añadimos el resutlado actual al final, y seguimos operando
             resultado.numero = resultado.add(suma).numero;
 
         }
@@ -163,64 +181,91 @@ class BigNumber {
         return resultado;
     }
 
-    // Divideix
+    // Divide. Hacemos la divisón entre dos objetos BigNumber
     BigNumber div(BigNumber other) {
 
+        //Creamos el objeto que contendrá el resultado de la operación
         BigNumber resultat = new BigNumber("");
 
-        BigNumber resto = new BigNumber("");
-
+        // En caso de que el dividendo sea menor al divisor, automáticamente devolveremos 0
         if (this.compareTo(other) == -1) {
             return new BigNumber("0");
         }
 
+        //El procedimiento para realizar la division es ir bajando del dividendo hasta que este sea mayor al
+        // divisor, en el objeto xifraDividir almacenaremos estos numeros que iremos bajando
         BigNumber xifraDividir = new BigNumber("");
 
+        //La división habrá terminado una vez hayamos recorrido el dividendo
         for (int i = 0; i < this.numero.length(); i++) {
 
+            //Bajamos un número del dividendo
             xifraDividir.numero += this.numero.charAt(i);
 
+            //Si con este número que hemos bajado, xifraDividir es mayor al divisor, podemos empezar a operar
             if (other.compareTo(xifraDividir) == -1) {
 
+                // Vamos probando números hasta encontrar el , multiplicándolo al divisor, se acerque más
+                // sin pasarse al dividendo
                 for (int j = 0; j < 11; j++) {
 
                     BigNumber multiplicacion = new BigNumber(String.valueOf(j)).mult(other);
 
+                    // Con esta comprobación, una vez que nos pasemos significará que el número que más
+                    // se aproxima al dividendo es una unidad menos que la actual
                     if (multiplicacion.compareTo(xifraDividir) == 1) {
+
+                        //Añadimos al resultado el valor anterior al actual y restamos a xifraDividir el valor
+                        // de dicho valor para poder continuar operando
                         resultat.numero += new BigNumber(String.valueOf(j - 1));
                         xifraDividir = xifraDividir.sub(new BigNumber(String.valueOf(j - 1)).mult(other));
                         break;
+
+                        // Cabe la posibilidad de que el resultado de la operación sea igual al dividendo,
+                        // en cuyo caso añadiríamos el valor actual y restaríamos eso a xifraDividir
                     } else if (multiplicacion.compareTo(xifraDividir) == 0) {
                         resultat.numero += new BigNumber(String.valueOf(j));
                         xifraDividir = xifraDividir.sub(multiplicacion);
                         break;
                     }
+
                 }
+                // En el caso de que el divisor y xifraDividir sean iguales, añadiríamos un 1 y nos evitariamos
+                // hacer todas las comprobaciones
             } else if (other.compareTo(xifraDividir) == 0) {
                 resultat.numero += new BigNumber("1");
                 xifraDividir.numero = "0";
-            } else if (resultat.numero.length() > 0) {
+
+                // Si no se cumple ninguno de los casos anteriores, añadiríamos un 0 al resultado para proceder a
+                // bajar el siguiente número
+            } else {
                 resultat.numero += 0;
             }
         }
 
-        resto.numero = xifraDividir.numero;
         return resultat;
     }
 
 
-    // Arrel quadrada
+    // Raíz Cuadrada. Realizamos la raíz cuadrada de un objeto BigNumber
     BigNumber sqrt() {
+
+        // Creamos dos objetos BigNumber, resultado, como su nombre indica almacenará el resultado final de la operación
+        // y aux será utilizado de manera parecida a la división, ya que para la raíz cuadrada deberemos de ir bajando
+        // números, pero esta vez, de dos en dos
 
         BigNumber resultado = new BigNumber("0");
         BigNumber aux = new BigNumber("");
 
+        // Tenemos que dividir el número en grupos de 2, así que si la longitud del número es impar,
+        // añadiremos un 0 a la izquierda
 
         if (this.numero.length() % 2 != 0) {
             this.numero = "0" + this.numero;
         }
 
-        System.out.println("Dividimos en grupos de 2 el dividendo : ");
+        // Creamos el array donde irán almacenados los números y los dejamos vacíos para, posteriormente añadirle
+        // los valores correspondientes
 
         String[] rQuad = new String[this.numero.length() / 2];
 
@@ -231,35 +276,28 @@ class BigNumber {
             for (int j = 0; j < 2; j++, cont++) {
                 rQuad[i] += this.numero.charAt(cont);
             }
-            System.out.println(i + " - " + rQuad[i]);
 
         }
 
-
-        System.out.println("Bajamos los 2 primeros numeros");
-
-        System.out.println("Buscamos un numero que se aproxime sin superar el valor de los primeros 2 numeros");
+        // Añadiremos a aux los siguientes 2 valores y empezaremos a operar
 
         for (int i = 0; i < rQuad.length; i++) {
-            System.out.println("Entramos en el primer bucle");
             aux.numero += rQuad[i];
 
-            System.out.println("El valor actual de aux es " + aux);
+            // Tenemos que buscar un numero que, añadiéndolo a la derecha del resultado por 2,  multiplicándolo por el mismo
+            // se acerque lo máximo posible a aux sin sobrepasarlo.
 
             for (int j = 0; j < 11; j++) {
 
-                //  BigNumber resX2 = new BigNumber((resultado.mult(new BigNumber("2")).add(new BigNumber(String.valueOf(j)))).mult(new BigNumber(String.valueOf(j))));
+                //resX2 almacenará el resultado multiplicado por 2, añadiendo  a la derecha el valor que estamos
+                // probando ahora, multiplicado por ese mismo valor
 
                 BigNumber resX2 = new BigNumber(resultado.mult(new BigNumber("2")).numero + (j));
                 resX2 = resX2.mult(new BigNumber(String.valueOf(j)));
 
-
-                System.out.println("Valor de resX2 es " + resX2);
-                System.out.println("Valor de aux es " + aux);
-
+                // Estas comprobaciones son exactamente igual a las de la división, si supera el valor de aux
+                // añadiremos el valor anterior al resultado y restaremos a aux dicho valor
                 if (resX2.compareTo(aux) == 1) {
-                    System.out.println("El numero inmediatamente mayor a " + aux + " es " + resX2);
-
 
                     BigNumber resta = new BigNumber(resultado.mult(new BigNumber("2")).numero + (j - 1));
 
@@ -271,8 +309,8 @@ class BigNumber {
 
 
                     break;
+                    // En caso de que sea igual a aux resultado es el valor actual y restamos a aux el valor
                 } else if (resX2.equals(aux)) {
-                    System.out.println(aux + " y " + resX2 + " son iguales");
                     resultado.numero += j;
                     aux = aux.sub(resX2);
                     break;
@@ -282,17 +320,18 @@ class BigNumber {
 
 
         }
-        System.out.println("resultado es " + resultado);
-
 
         return resultado;
     }
 
-    // Potència
+    // Potencia. Realizamos la potencia de un numero BigNumber elevado a un int
     BigNumber power(int n) {
 
+        // Creamos un objeto BigNumber que contendrá el resultado que inicialmente tendrá el valor del objeto
+        // que recibamos
         BigNumber resultat = new BigNumber(this.numero);
 
+        //Hacemos un bucle tantas veces como nos indiquen y multiplicaremos el resultado por el objeto recibido
         for (int i = 1; i < n; i++) {
             resultat = resultat.mult(this);
         }
@@ -300,18 +339,24 @@ class BigNumber {
         return resultat;
     }
 
-    // Factorial
+    // Factorial. Realizar el factorial de un objeto BigNumber
     BigNumber factorial() {
 
-        BigNumber bn = new BigNumber(this.numero);
+        // Creamos un objeto BigNumber que inicialmente tendrá el contenido del objeto BigNumber recibido
+        BigNumber resultado = new BigNumber(this.numero);
 
-        int i = 1;
+        // Mientras el objeto recibido sea mayor a la variable i, tendremos que ir multiplicándolo
 
+        int i = 2;
+
+
+        // Tenemos un objeto BigNumber que hará de contador que recibe el valor del objeto recibido
         BigNumber count = new BigNumber(this);
 
         while (this.compareTo(new BigNumber(String.valueOf(i))) == 1) {
 
-            bn = bn.mult(count.sub(new BigNumber(("1"))));
+            // El resultado será igual a la multiplicación de contador restado 1 hasta que contador tenga el valor de 2
+            resultado = resultado.mult(count.sub(new BigNumber(("1"))));
             count = count.sub(new BigNumber("1"));
 
             i++;
@@ -319,44 +364,54 @@ class BigNumber {
         }
 
 
-        return bn;
+        return resultado;
 
     }
 
-    // MCD. Torna el Màxim comú divisor
+    // MCD. Realizar el máximo común divisor entre dos objetos BigNumber
     BigNumber mcd(BigNumber other) {
 
-        return obtener_mcd(this, other);
+        // Para realizar esta operación, hacemos uso del Teorema de Euclides, por lo que será necesario hacer un
+        // proceso recursivo del programa
+
+        // Eliminamos los 0 que puedan tener los dos objetos BigNumber recibidos, ya que sino la operación
+        // se retrasaría muchísimo más de lo normal
+        removeZero(this);
+        removeZero(other);
+
+        // En el caso de que uno de los valores sea 0, devolveremos el otro de los objetos que tenemos
+        if (other.equals(new BigNumber("0"))) {
+            return this;
+        } else if (this.equals(new BigNumber("0"))) {
+            return other;
+            // Si ninguno es 0, tenemos que obtener el resto de la division del primer objeto entre el segundo hasta
+            // conseguir que uno de los dos tenga el valor 0, el otro objeto tendra el valor esperado
+        } else
+            return other.mcd(this.getResto(other));
+
     }
 
-    // Compara dos BigNumber. Torna 0 si són iguals, -1
-// si el primer és menor i torna 1 si el segon és menor
+    // Compara dos BigNumber. Devuelve 0 sin los dos objetos son iguales, -1 si el primero es menor, y devuelve
+    //  1 si el segundo es menor
     public int compareTo(BigNumber other) {
 
+        // En el caso de que uno de los objetos sea más largo que otro, tendremos que igualarlo, por lo tanto
+        // llamamos a una función que añade tantos 0 como le pasemos
 
         if (this.numero.length() > other.numero.length()) {
 
-            while (this.numero.length() > other.numero.length()) {
-
-                other.numero = '0' + other.numero;
-            }
+            addZero(other, this.numero.length());
 
         } else if (this.numero.length() < other.numero.length()) {
 
-            while (this.numero.length() < other.numero.length()) {
-                this.numero = '0' + this.numero;
-            }
-
+            addZero(this, other.numero.length());
         }
 
+        // Llamamos a equals para comprobar si son el mismo número, es el resultado es true, devolvemos 0
         if (this.numero.equals(other.numero)) return 0;
 
-        if (this.numero.length() > other.numero.length()) return 1;
-
-
-        if (this.numero.length() < other.numero.length()) return -1;
-
-
+        // Una vez que hemos comprobado que no son iguales,
+        // iremos comprobando unidad por unidad cual de los dos es mayor
         for (int i = 0; i < this.numero.length(); i++) {
 
             int numPrimer = Integer.parseInt(String.valueOf(this.numero.charAt(i)));
@@ -377,13 +432,14 @@ class BigNumber {
 
     }
 
-    // Torna un String representant el número
+    // Devuelve un String que representa el número del objeto
     @Override
     public String toString() {
         return this.numero;
     }
 
-    // Mira si dos objectes BigNumber són iguals
+
+    // Mira si dos objetos BigNumber son iguales
     @Override
     public boolean equals(Object other) {
 
@@ -394,15 +450,26 @@ class BigNumber {
             //Creamos un objeto BigNumber casteando
             BigNumber bb = (BigNumber) other;
 
-            //Comprobamos el caso de que sean todo 0
+            //Comprobamos si alguno de los numeros está compuesto únicamente por 0
             if (allZero(this)) {
+
                 if (allZero(bb)) {
+
                     return true;
-                } else return false;
+
+                } else {
+
+                    return false;
+
+                }
+
             } else if (allZero(bb)) {
+
                 return false;
+
             }
 
+            // Comprobamos la longitud para igualarla y poder comprobar el número carácter por carácter
             if (this.numero.length() > bb.numero.length()) {
 
                 bb.numero = addZero(bb, this.numero.length());
@@ -425,7 +492,7 @@ class BigNumber {
     }
 
 
-    //Comprobamos si el numero de BigNumber sea todo 0
+    // Comprobamos si el numero de BigNumber sea todo 0
     boolean allZero(BigNumber bn) {
 
         for (int i = 0; i < bn.numero.length(); i++) {
@@ -434,12 +501,11 @@ class BigNumber {
             }
         }
 
-
         return true;
     }
 
 
-    //Funcion para añadir ceros a la izquieda y que queden los numeros con la misma longitud
+    // Funcion para añadir ceros a la izquieda y que queden los numeros con la misma longitud
     String addZero(BigNumber bn, int nLong) {
 
         while (bn.numero.length() < nLong) {
@@ -450,15 +516,13 @@ class BigNumber {
         return bn.numero;
     }
 
+    // Función que obtiene el resto a partir de una división.
     BigNumber getResto(BigNumber bn) {
 
-        BigNumber resultat = new BigNumber("");
-
-        resultat = this.sub(bn.mult(this.div(bn)));
-
-        return resultat;
+        return new BigNumber(this.sub(bn.mult(this.div(bn))));
     }
 
+    //Función que elimina los 0 a la izquierda de un objeto BigNumber
     BigNumber removeZero(BigNumber bn) {
 
         if (!allZero(bn)) {
@@ -468,21 +532,6 @@ class BigNumber {
             }
         }
         return bn;
-    }
-
-    BigNumber obtener_mcd(BigNumber bn1, BigNumber bn) {
-
-
-        removeZero(bn1);
-        removeZero(bn);
-
-        if (bn.equals(new BigNumber("0"))) {
-            return bn1;
-        } else if (bn1.equals(new BigNumber("0"))) {
-            return bn;
-        } else
-            return obtener_mcd(bn, bn1.getResto(bn));
-
     }
 
 }

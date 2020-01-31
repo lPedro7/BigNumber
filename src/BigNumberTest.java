@@ -270,13 +270,13 @@ public class BigNumberTest {
     @Test
     public void arrels() {
         BigNumber b1;
-/*
+
        b1 = new BigNumber("9");
         assertEquals(new BigNumber("3"), b1.sqrt());
 
         b1 = new BigNumber("101");
         assertEquals(new BigNumber("10"), b1.sqrt());
-*/
+
         b1 = new BigNumber("43534526");
         assertEquals(new BigNumber("6598"), b1.sqrt());
 
