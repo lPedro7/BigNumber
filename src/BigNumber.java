@@ -125,9 +125,14 @@ class BigNumber {
         //Creamos el objeto que contendrá el resultado de la operación
         BigNumber resultado = new BigNumber("");
 
-        //Si uno de los dos valores es 0, devolveremos 0 directamente
+        //Si uno de los dos valores es 0, devolveremos 0 directamente y si uno de los dos es 1, devolverá el otro valor
         if (this.equals(new BigNumber("0")) || other.equals(new BigNumber("0"))) return new BigNumber("0");
 
+        if (this.equals(new BigNumber("1"))){
+            return other;
+        }else if (other.equals(new BigNumber("1"))){
+            return this;
+        }
 
         //En este bucle añadimos una variable llamada "cont", que sirve para hacer el escalado cuando operamos
         // añadiendo 0 a la derecha
@@ -387,7 +392,7 @@ class BigNumber {
             // Si ninguno es 0, tenemos que obtener el resto de la division del primer objeto entre el segundo hasta
             // conseguir que uno de los dos tenga el valor 0, el otro objeto tendra el valor esperado
         } else
-            return other.mcd(this.getResto(other));
+            return other.mcd( getResto(this,other) );
 
     }
 
@@ -422,9 +427,11 @@ class BigNumber {
             if (numPrimer > numSegon) {
 
                 return 1;
+
             } else if (numSegon > numPrimer) {
 
                 return -1;
+
             }
         }
 
@@ -450,25 +457,6 @@ class BigNumber {
             //Creamos un objeto BigNumber casteando
             BigNumber bb = (BigNumber) other;
 
-            //Comprobamos si alguno de los numeros está compuesto únicamente por 0
-            if (allZero(this)) {
-
-                if (allZero(bb)) {
-
-                    return true;
-
-                } else {
-
-                    return false;
-
-                }
-
-            } else if (allZero(bb)) {
-
-                return false;
-
-            }
-
             // Comprobamos la longitud para igualarla y poder comprobar el número carácter por carácter
             if (this.numero.length() > bb.numero.length()) {
 
@@ -492,7 +480,7 @@ class BigNumber {
     }
 
 
-    // Comprobamos si el numero de BigNumber sea todo 0
+    // Comprobamos si el numero de BigNumber está compuesto únicamente por 0
     boolean allZero(BigNumber bn) {
 
         for (int i = 0; i < bn.numero.length(); i++) {
@@ -517,9 +505,9 @@ class BigNumber {
     }
 
     // Función que obtiene el resto a partir de una división.
-    BigNumber getResto(BigNumber bn) {
+    BigNumber getResto(BigNumber bn, BigNumber bn2) {
 
-        return new BigNumber(this.sub(bn.mult(this.div(bn))));
+        return new BigNumber(bn.sub(bn2.mult(bn.div(bn2))));
     }
 
     //Función que elimina los 0 a la izquierda de un objeto BigNumber
